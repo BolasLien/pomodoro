@@ -20,6 +20,20 @@ export default new Vuex.Store({
     },
     dragTodo (state, data) {
       state.todos = data
+    },
+    delTodo (state, data) {
+      state.todos.splice(data, 1)
+    },
+    editTodo (state, data) {
+      state.todos[data].edit = !state.todos[data].edit
+    },
+    cancelTodo (state, data) {
+      state.todos[data].edit = false
+      state.todos[data].model = state.todos[data].name
+    },
+    saveTodo (state, data) {
+      state.todos[data].edit = false
+      state.todos[data].name = state.todos[data].model
     }
   },
   actions: {

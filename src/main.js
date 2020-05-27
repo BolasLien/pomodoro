@@ -9,11 +9,11 @@ import store from './store'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faPen, faTrashAlt, faSave, faWindowClose } from '@fortawesome/free-solid-svg-icons'
 
 import draggable from 'vuedraggable'
 
-library.add(faCheck)
+library.add(faCheck, faPen, faTrashAlt, faSave, faWindowClose)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 Vue.component('draggable', draggable)
