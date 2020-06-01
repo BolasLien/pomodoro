@@ -9,14 +9,14 @@ import store from './store'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faCheck, faPen, faTrashAlt, faSave, faWindowClose, faPlay, faPause, faStepForward } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faPen, faTrashAlt, faSave, faWindowClose, faPlay, faPause, faStepForward, faPlusCircle, faCog, faClock, faPlus, faTasks } from '@fortawesome/free-solid-svg-icons'
 
 import draggable from 'vuedraggable'
 
 import 'noto-sans-tc/noto_sans_tc_regular/css.css'
 import './style/style.styl'
 
-library.add(faCheck, faPen, faTrashAlt, faSave, faWindowClose, faPlay, faPause, faStepForward)
+library.add(faCheck, faPen, faTrashAlt, faSave, faWindowClose, faPlay, faPause, faStepForward, faPlusCircle, faCog, faClock, faPlus, faTasks)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 Vue.component('draggable', draggable)
