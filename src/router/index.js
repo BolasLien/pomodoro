@@ -25,6 +25,17 @@ const routes = [
     }
   },
   {
+    path: '/finish',
+    name: 'Finish',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "finish" */ '../views/Finish.vue'),
+    meta: {
+      title: '番茄鐘 | 已完成'
+    }
+  },
+  {
     path: '/settings',
     name: 'Settings',
     // route level code-splitting

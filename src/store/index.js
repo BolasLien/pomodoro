@@ -11,6 +11,7 @@ export default new Vuex.Store({
   plugins: [createPersistedState()],
   state: {
     todos: [],
+    finishs: [],
     timeleft,
     alarm: 'alarm1.mp3',
     current: '',
@@ -50,12 +51,14 @@ export default new Vuex.Store({
     },
     countdown (state) {
       state.timeleft--
+      console.log(state.timeleft)
     },
-    finish (state) {
+    finish (state, data) {
       if (state.todos.length > 0) {
         state.isBreak = !state.isBreak
       }
-
+      console.log(data)
+      state.finishs.push({ name: data })
       state.current = ''
       state.timeleft = state.isBreak ? timeleftBreak : timeleft
     }
@@ -79,6 +82,9 @@ export default new Vuex.Store({
     },
     isBreak (state) {
       return state.isBreak
+    },
+    finishs (state) {
+      return state.finishs
     }
   }
 })
