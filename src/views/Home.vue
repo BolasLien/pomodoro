@@ -1,16 +1,26 @@
 <template>
-  <div id="home">
-    <h1>{{ currentText }}</h1>
-    <h2>{{ timetext }}</h2>
-    <b-btn variant="primary" v-if="status != 1" @click="start">
-      <font-awesome-icon :icon="['fas','play']" ></font-awesome-icon>
-    </b-btn>
-        <b-btn variant="primary" v-if="status == 1" @click="pause">
-      <font-awesome-icon :icon="['fas','pause']" ></font-awesome-icon>
-    </b-btn>
-        <b-btn variant="primary" v-if="current.length > 0 || todos.length > 0" @click="finish(true)">
-      <font-awesome-icon :icon="['fas','step-forward']"></font-awesome-icon>
-    </b-btn>
+  <div id="home" class="row flex-column justify-content-center">
+    <div class="col">
+      <h1>{{ currentText }}</h1>
+    </div>
+
+    <div class="col">
+      <h2>{{ timetext }}</h2>
+    </div>
+
+    <div class="col">
+      <b-btn variant="primary" v-if="status != 1" @click="start">
+        <font-awesome-icon :icon="['fas','play']" ></font-awesome-icon>
+      </b-btn>
+
+      <b-btn variant="primary" v-if="status == 1" @click="pause">
+        <font-awesome-icon :icon="['fas','pause']" ></font-awesome-icon>
+      </b-btn>
+
+      <b-btn variant="primary" v-if="current.length > 0 || todos.length > 0" @click="finish(true,current)">
+        <font-awesome-icon :icon="['fas','step-forward']"></font-awesome-icon>
+      </b-btn>
+    </div>
   </div>
 </template>
 
@@ -38,6 +48,7 @@ export default {
       return this.$store.getters.alarm
     },
     timeleft () {
+      // console.log('getTimeleft')
       return this.$store.getters.timeleft
     },
     current () {
@@ -75,7 +86,7 @@ export default {
     finish (skip) {
       clearInterval(this.timer)
       this.status = 0
-      this.$store.commit('finish')
+      this.$store.commit('finish', this.current)
 
       if (!skip) {
         const audio = new Audio()
