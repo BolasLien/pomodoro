@@ -64,7 +64,11 @@ export default {
   },
   methods: {
     addTodo () {
-      this.$store.commit('addTodo', this.newtodo)
+      if (this.newtodo.length === 0) {
+        alert('不可以新增空白的待辦事項')
+      } else {
+        this.$store.commit('addTodo', this.newtodo)
+      }
     },
     delTodo (index) {
       this.$store.commit('delTodo', index)
@@ -76,7 +80,11 @@ export default {
       this.$store.commit('cancelTodo', index)
     },
     saveTodo (index) {
-      this.$store.commit('saveTodo', index)
+      if (this.newtodo.length === 0) {
+        alert('無法修改為空白的待辦事項')
+      } else {
+        this.$store.commit('saveTodo', index)
+      }
     },
     listEdit () {
       this.isEdit = !this.isEdit
