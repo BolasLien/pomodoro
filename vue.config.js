@@ -6,11 +6,11 @@ module.exports = {
       // APP 名稱
       name: '番茄鐘',
       short_name: '番茄鐘',
-      theme_color: '#4DBA87',
-      background_color: '#000',
+      theme_color: '#ffa69e',
+      background_color: '#ff686b',
       scope: './',
       start_url: './',
-      display: 'standalone',
+      display: 'fullscreen',
       icons: [
         {
           src: './img/icons/android-chrome-192x192.png',
