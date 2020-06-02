@@ -6,7 +6,7 @@ import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
 import store from './store'
-import VueAnalytics from 'vue-analytics'
+import VueGtag from 'vue-gtag'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -22,8 +22,8 @@ Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 Vue.component('draggable', draggable)
 
-Vue.use(VueAnalytics, {
-  id: 'UA-168227875-1'
+Vue.use(VueGtag, {
+  config: { id: 'UA-168227875-1' }
 })
 
 Vue.config.productionTip = false
