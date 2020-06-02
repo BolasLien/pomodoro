@@ -6,7 +6,7 @@
           <b-form-input v-model="newtodo" placeholder="新增待辦事項..."></b-form-input>
         </div>
         <div class="col-2">
-          <b-btn variant="success" @click="addTodo">
+          <b-btn variant="secondary" @click="addTodo">
             <font-awesome-icon :icon="['fas','plus']"></font-awesome-icon>
           </b-btn>
         </div>
@@ -56,7 +56,7 @@ export default {
     return {
       newtodo: '',
       isEdit: false,
-      editColor: 'primary',
+      editColor: 'secondary',
       dragOption: {
         animation: 200
       }
@@ -88,7 +88,7 @@ export default {
     },
     listEdit () {
       this.isEdit = !this.isEdit
-      this.editColor = this.isEdit ? 'danger' : 'primary'
+      this.editColor = this.isEdit ? 'danger' : 'secondary'
     }
   },
   computed: {

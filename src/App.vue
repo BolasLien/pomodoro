@@ -1,9 +1,9 @@
 <template>
   <div id="app" class="vh-100 d-flex flex-column">
     <div id="app-head" class="container">
-      <div class="row">
+      <div class="row" :style="color">
         <div class="col text-center p-0">
-          <h1 class="bg-danger">番茄鐘</h1>
+          <h2>番茄鐘</h2>
         </div>
       </div>
     </div>
@@ -12,7 +12,7 @@
         <router-view />
       </keep-alive>
     </div>
-    <div id="app-footer" class="container fixed-bottom bg-danger">
+    <div id="app-footer" class="container fixed-bottom" :style="color">
       <div id="nav" class="row justify-content-center align-items-center h-100">
         <div class="col text-center">
           <router-link class="btn" to="/">
@@ -42,3 +42,13 @@
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  computed: {
+    color () {
+      return `background: ${this.$store.getters.getDarkColor}; `
+    }
+  }
+}
+</script>

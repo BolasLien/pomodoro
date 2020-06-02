@@ -102,6 +102,12 @@ export default new Vuex.Store({
     },
     status (state) {
       return state.status
+    },
+    getDarkColor (state) {
+      return state.isBreak ? '#84DCC6' : state.status !== 1 ? '#f7f7f7' : '#ff686b'
+    },
+    getLightColor (state) {
+      return state.isBreak ? '#A5FFD6' : state.status !== 1 ? '#f7f7f7' : '#ffa69e'
     }
   }
 })
