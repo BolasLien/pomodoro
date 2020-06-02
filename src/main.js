@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faCheck, faPen, faTrashAlt, faSave, faWindowClose, faPlay, faPause, faStepForward, faPlusCircle, faCog, faClock, faPlus, faTasks } from '@fortawesome/free-solid-svg-icons'
 
 import draggable from 'vuedraggable'
+import VueEllipseProgress from 'vue-ellipse-progress'
 
 import 'noto-sans-tc/noto_sans_tc_regular/css.css'
 import './style/style.styl'
@@ -21,6 +22,7 @@ library.add(faCheck, faPen, faTrashAlt, faSave, faWindowClose, faPlay, faPause, 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 Vue.component('draggable', draggable)
+Vue.use(VueEllipseProgress, 'vep')
 
 Vue.use(VueGtag, {
   config: { id: 'UA-168227875-1' }

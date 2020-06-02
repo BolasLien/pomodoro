@@ -7,7 +7,9 @@
     <div class="col">
       <h2>{{ timetext }}</h2>
     </div>
-
+    <div class="col">
+        <timer></timer>
+    </div>
     <div class="col">
       <b-btn variant="primary" v-if="status != 1" @click="start">
         <font-awesome-icon :icon="['fas','play']" ></font-awesome-icon>
@@ -25,11 +27,15 @@
 </template>
 
 <script>
+import Timer from '../components/Timer.vue'
 export default {
   data () {
     return {
       timer: 0
     }
+  },
+  components: {
+    timer: Timer
   },
   computed: {
     currentText () {
