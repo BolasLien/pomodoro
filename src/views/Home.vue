@@ -48,7 +48,6 @@ export default {
       return this.$store.getters.alarm
     },
     timeleft () {
-      // console.log('getTimeleft')
       return this.$store.getters.timeleft
     },
     current () {
