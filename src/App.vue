@@ -8,7 +8,9 @@
       </div>
     </div>
     <div id="app-content" class="container vw-100">
-      <router-view />
+      <keep-alive>
+        <router-view />
+      </keep-alive>
     </div>
     <div id="app-footer" class="container fixed-bottom bg-danger">
       <div id="nav" class="row justify-content-center align-items-center h-100">
