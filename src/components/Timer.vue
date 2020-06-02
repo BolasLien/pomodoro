@@ -1,6 +1,6 @@
 <template>
   <div id="timer">
-<vep
+    <vep
       :progress="progress"
       :determinate="determinate"
       :color="color"
@@ -17,17 +17,15 @@
       font-color="white"
       animation="loop 1000 100"
       :loading="isBreak"
-      :no-data="noData">
-
-  <span slot="legend-value">/200</span>
-  <div slot="legend-caption">
-    <h1>{{ currentText }}</h1>
-    <br>
-    <h2>{{ timetext }}</h2>
-  </div>
-
-</vep>
-
+      :no-data="noData"
+    >
+      <span slot="legend-value">/200</span>
+      <div slot="legend-caption">
+        <h1>{{ currentText }}</h1>
+        <br />
+        <h2>{{ timetext }}</h2>
+      </div>
+    </vep>
   </div>
 </template>
 
@@ -65,16 +63,25 @@ export default {
       return this.$store.getters.getLightColor
     },
     dash () {
-      return 'strict ' + (this.fullTime / 60) + ' 0.8'
+      // return 'strict ' + (this.fullTime / 60) + ' 0.8'
+      return '0'
     },
     fullTime () {
-      return parseInt(this.isBreak ? process.env.VUE_APP_TIMELEFT_BREAK : process.env.VUE_APP_TIMELEFT)
+      return parseInt(
+        this.isBreak
+          ? process.env.VUE_APP_TIMELEFT_BREAK
+          : process.env.VUE_APP_TIMELEFT
+      )
     },
     progress () {
       return (this.timeleft / this.fullTime) * 100
     },
     currentText () {
-      return this.current.length > 0 ? this.current : this.todos.length > 0 ? '點擊開始' : '沒有事項'
+      return this.current.length > 0
+        ? this.current
+        : this.todos.length > 0
+          ? '點擊開始'
+          : '沒有事項'
     },
     timetext () {
       const m = Math.floor(this.timeleft / 60)
