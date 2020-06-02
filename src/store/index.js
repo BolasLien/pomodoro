@@ -15,7 +15,11 @@ export default new Vuex.Store({
     timeleft,
     alarm: 'alarm1.mp3',
     current: '',
-    isBreak: false
+    isBreak: false,
+    // 0 = 停止
+    // 1 = 播放
+    // 2 = 暫停
+    status: 0
   },
   mutations: {
     selectAlarm (state, file) {
@@ -68,6 +72,9 @@ export default new Vuex.Store({
     },
     delFinish (state, data) {
       state.finishs.splice(data, 1)
+    },
+    setStatus (state, data) {
+      state.status = data
     }
   },
   actions: {
@@ -92,6 +99,9 @@ export default new Vuex.Store({
     },
     finishs (state) {
       return state.finishs
+    },
+    status (state) {
+      return state.status
     }
   }
 })

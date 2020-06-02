@@ -28,10 +28,6 @@
 export default {
   data () {
     return {
-      // 0 = 停止
-      // 1 = 播放
-      // 2 = 暫停
-      status: 0,
       timer: 0
     }
   },
@@ -55,6 +51,14 @@ export default {
     },
     todos () {
       return this.$store.getters.todos
+    },
+    status: {
+      get () {
+        return this.$store.getters.status
+      },
+      set (value) {
+        this.$store.commit('setStatus', value)
+      }
     }
   },
   methods: {
