@@ -51,16 +51,23 @@ export default new Vuex.Store({
     },
     countdown (state) {
       state.timeleft--
-      console.log(state.timeleft)
     },
     finish (state, data) {
       if (state.todos.length > 0) {
         state.isBreak = !state.isBreak
       }
-      console.log(data)
-      state.finishs.push({ name: data })
+
+      if (data !== '休息一下') { state.finishs.push({ name: data }) }
+
       state.current = ''
       state.timeleft = state.isBreak ? timeleftBreak : timeleft
+    },
+    again (state, data) {
+      state.todos.push({ name: data.item.name, edit: false, model: data.item.name })
+      state.finishs.splice(data.index, 1)
+    },
+    delFinish (state, data) {
+      state.finishs.splice(data, 1)
     }
   },
   actions: {
