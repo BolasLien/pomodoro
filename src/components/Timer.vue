@@ -77,11 +77,7 @@ export default {
       return (this.timeleft / this.fullTime) * 100
     },
     currentText () {
-      return this.current.length > 0
-        ? this.current
-        : this.todos.length > 0
-          ? '點擊開始'
-          : '沒有事項'
+      return this.current.length > 0 ? this.current : this.todos.length > 0 ? '點擊開始' : '沒有事項'
     },
     timetext () {
       const m = Math.floor(this.timeleft / 60)

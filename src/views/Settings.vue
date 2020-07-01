@@ -23,11 +23,19 @@ export default {
       items: [
         {
           name: '鬧鈴',
-          file: 'alarm1.mp3'
+          file: 'Alarm1.mp3'
         },
         {
-          name: 'Finish',
-          file: 'alarm2.wav'
+          name: '電子鬧鈴',
+          file: 'Alarm2.mp3'
+        },
+        {
+          name: '哨聲長',
+          file: 'Whistle1.mp3'
+        },
+        {
+          name: '哨聲短',
+          file: 'Whistle2.mp3'
         }
       ],
       fields: [
