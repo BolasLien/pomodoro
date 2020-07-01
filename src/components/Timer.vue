@@ -8,7 +8,7 @@
       :emptyColorFill="emptyColorFill"
       thickness="10%"
       emptyThickness="15%"
-      :size="400"
+      :size="350"
       :dash="dash"
       lineMode="normal"
       :legend="false"
@@ -48,6 +48,9 @@ export default {
     current () {
       return this.$store.state.current
     },
+    timepick () {
+      return this.$store.state.timepick
+    },
     timeleft () {
       return this.$store.state.timeleft
     },
@@ -70,7 +73,7 @@ export default {
       return parseInt(
         this.isBreak
           ? process.env.VUE_APP_TIMELEFT_BREAK
-          : process.env.VUE_APP_TIMELEFT
+          : parseInt(this.timepick.mm * 60) + parseInt(this.timepick.ss)
       )
     },
     progress () {
