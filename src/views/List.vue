@@ -2,9 +2,13 @@
   <div id="list" class="row flex-column">
     <div class="col mb-3">
       <div class="row">
-        <div class="col-8">
+        <div class="col-4">
           <b-form-input v-model="newtodo" placeholder="新增待辦事項..."></b-form-input>
         </div>
+        <div class="col-4">
+          <VueTimepicker format="mm:ss" v-model="timepick" placeholder="選擇時間"></VueTimepicker>
+        </div>
+
         <div class="col-2">
           <b-btn variant="secondary" @click="addTodo">
             <font-awesome-icon :icon="['fas','plus']"></font-awesome-icon>
@@ -27,13 +31,14 @@
           <b-tr v-else v-for="(todo, index) in todos" :key="index">
             <b-td>
               <b-form-input v-model="todo.model" v-if="todo.edit"></b-form-input>
+              <VueTimepicker format="mm:ss" v-model="todo.timepick" placeholder="選擇時間" v-if="todo.edit"></VueTimepicker>
               <b-btn variant="link" class="text-danger" v-if="todo.edit" @click="cancelTodo(index)">
                 <font-awesome-icon :icon="['fas','window-close']" size="2x"></font-awesome-icon>
               </b-btn>
               <b-btn variant="link" class="text-success" v-if="todo.edit" @click="saveTodo(index)">
                 <font-awesome-icon :icon="['fas','save']" size="2x"></font-awesome-icon>
               </b-btn>
-              <span v-else>{{ todo.name }}</span>
+              <span v-else>{{ '待辦事項： ' + todo.name + ' 需要時間： ' + `${todo.timepick.mm} 分 ${todo.timepick.ss} 秒`}}</span>
             </b-td>
             <b-td>
               <b-btn v-if="isEdit" variant="link" class="text-primary" @click="editTodo(index)">
@@ -55,6 +60,7 @@ export default {
   data () {
     return {
       newtodo: '',
+      timepick: {},
       isEdit: false,
       editColor: 'secondary',
       dragOption: {
@@ -65,9 +71,12 @@ export default {
   methods: {
     addTodo () {
       if (this.newtodo.length === 0) {
-        alert('不可以新增空白的待辦事項')
+        alert('請輸入待辦事項')
+      } else if (Object.keys(this.timepick).length === 0 || this.timepick.mm.length === 0 || this.timepick.ss.length === 0 || (parseInt(this.timepick.mm) === 0 && parseInt(this.timepick.ss) === 0)) {
+        alert('請選擇時間')
       } else {
-        this.$store.commit('addTodo', this.newtodo)
+        // const timelength = parseInt(this.timepick.mm * 60) + parseInt(this.timepick.ss)
+        this.$store.commit('addTodo', [this.newtodo, this.timepick])
       }
     },
     delTodo (index) {
@@ -80,11 +89,7 @@ export default {
       this.$store.commit('cancelTodo', index)
     },
     saveTodo (index) {
-      if (this.newtodo.length === 0) {
-        alert('無法修改為空白的待辦事項')
-      } else {
-        this.$store.commit('saveTodo', index)
-      }
+      this.$store.commit('saveTodo', index)
     },
     listEdit () {
       this.isEdit = !this.isEdit

@@ -34,6 +34,9 @@ export default {
     alarm () {
       return this.$store.getters.alarm
     },
+    timepick () {
+      return this.$store.getters.timepick
+    },
     timeleft () {
       return this.$store.getters.timeleft
     },
@@ -80,7 +83,7 @@ export default {
     finish (skip) {
       clearInterval(this.timer)
       this.status = 0
-      this.$store.commit('finish', this.current)
+      this.$store.commit('finish', [this.current, this.timepick])
 
       if (!skip) {
         const audio = new Audio()
@@ -91,7 +94,7 @@ export default {
       if (this.todos.length > 0) {
         this.start()
       } else {
-        // alert('結束')
+        // alert('太棒了！你完成所有的任務了！')
       }
     },
     pause () {

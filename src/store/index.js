@@ -4,7 +4,7 @@ import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
 
-const timeleft = parseInt(process.env.VUE_APP_TIMELEFT)
+// const timeleft = parseInt(process.env.VUE_APP_TIMELEFT)
 const timeleftBreak = parseInt(process.env.VUE_APP_TIMELEFT_BREAK)
 
 export default new Vuex.Store({
@@ -12,7 +12,8 @@ export default new Vuex.Store({
   state: {
     todos: [],
     finishs: [],
-    timeleft,
+    timepick: 0,
+    timeleft: 0,
     alarm: 'alarm1.mp3',
     current: '',
     isBreak: false,
@@ -26,7 +27,7 @@ export default new Vuex.Store({
       state.alarm = file
     },
     addTodo (state, data) {
-      state.todos.push({ name: data, edit: false, model: data })
+      state.todos.push({ name: data[0], edit: false, model: data[0], timepick: data[1] })
     },
     dragTodo (state, data) {
       state.todos = data
@@ -50,6 +51,8 @@ export default new Vuex.Store({
         state.current = '休息一下'
       } else {
         state.current = state.todos[0].name
+        state.timeleft = parseInt(state.todos[0].timepick.mm * 60) + parseInt(state.todos[0].timepick.ss)
+        state.timepick = state.todos[0].timepick
         state.todos.splice(0, 1)
       }
     },
@@ -57,17 +60,16 @@ export default new Vuex.Store({
       state.timeleft--
     },
     finish (state, data) {
-      if (state.todos.length > 0) {
-        state.isBreak = !state.isBreak
-      }
-
-      if (data !== '休息一下') { state.finishs.push({ name: data }) }
+      if (data[0] !== '休息一下') { state.finishs.push({ name: data[0], timepick: data[1] }) }
 
       state.current = ''
-      state.timeleft = state.isBreak ? timeleftBreak : timeleft
+      if (state.todos.length > 0) {
+        state.isBreak = !state.isBreak
+        state.timeleft = state.isBreak ? timeleftBreak : parseInt(state.todos[0].timepick.mm * 60) + parseInt(state.todos[0].timepick.ss)
+      }
     },
     again (state, data) {
-      state.todos.push({ name: data.item.name, edit: false, model: data.item.name })
+      state.todos.push({ name: data.item.name, edit: false, model: data.item.name, timepick: data.item.timepick })
       state.finishs.splice(data.index, 1)
     },
     delFinish (state, data) {
@@ -87,6 +89,9 @@ export default new Vuex.Store({
     },
     todos (state) {
       return state.todos
+    },
+    timepick (state) {
+      return state.timepick
     },
     timeleft (state) {
       return state.timeleft
