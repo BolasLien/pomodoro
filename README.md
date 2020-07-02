@@ -20,6 +20,7 @@
 * Vue.js
 * Vue cli
 * Vuex 和 VueRouter
+* Travis CI
 
 ## 引用套件
 * bootstrap-vue
