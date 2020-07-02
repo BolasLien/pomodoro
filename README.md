@@ -1,4 +1,4 @@
-# 番茄鐘練習
+# 番茄鐘
 由此進入https://bolaslien.github.io/pomodoro/
 
 ## 功能需求
