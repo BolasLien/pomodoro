@@ -1,20 +1,23 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-This is a Vue 2 SPA Pomodoro app. Keep feature logic close to existing folders:
+This is a Vue 3 SPA Pomodoro app (Vite + Pinia + Tailwind CSS 4). Keep feature logic close to existing folders:
 - `src/views/`: route pages (`Home.vue`, `List.vue`, `Finish.vue`, `Settings.vue`)
 - `src/components/`: reusable UI parts (for example `Timer.vue`)
-- `src/store/`: Vuex state and mutations
-- `src/router/`: route definitions and page titles
-- `src/style/`: global Stylus styles
-- `public/`: static assets, PWA files, and alarm audio in `public/alarms/`
+- `src/store/`: Pinia stores (`src/store/pomodoro.js`)
+- `src/router/`: Vue Router 4 route definitions
+- `src/style/`: global Tailwind entry (`src/style/main.css`)
+- `src/config/`: runtime settings (for example `src/config/runtime.js`)
+- `public/`: static assets and alarm audio in `public/alarms/`
 - `tests/e2e/`: Playwright end-to-end tests
+- `docs/`: project specs, migration docs, ADRs
 
 ## Build, Test, and Development Commands
 - `npm install`: install dependencies.
-- `npm run serve`: start local dev server (Vue CLI, default port `8080`).
+- `npm run dev`: start local dev server (Vite, default port `5173`).
 - `npm run build`: build production bundle to `dist/`.
-- `npm run lint`: run ESLint (`@vue/standard` rules).
+- `npm run preview`: preview the built app locally.
+- `npm run lint`: run ESLint.
 - `npm run test:e2e`: run Playwright E2E tests headless.
 - `npm run test:e2e:ui`: open Playwright UI mode.
 - `npm run test:e2e:debug`: run E2E in debug mode.
@@ -45,5 +48,5 @@ This is a Vue 2 SPA Pomodoro app. Keep feature logic close to existing folders:
   - linked issue or checklist item when available
 
 ## Configuration & Security Notes
-- Runtime env values are in `.env.development` and `.env.production`.
-- Keep secrets out of repo; use local overrides (for example `.env.local`) when needed.
+- Runtime behavior is configured in code (`src/config/runtime.js`) using mode checks (`production` / `test`).
+- Keep secrets out of repo. This project currently does not require committed `.env` files.

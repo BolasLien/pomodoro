@@ -140,13 +140,13 @@
 
 ## 8. 建置與部署規格
 - NPM scripts：
-- `npm run serve`：本機開發
+- `npm run dev`：本機開發
 - `npm run build`：正式建置
 - `npm run lint`：程式檢查
-- CI/CD（`.travis.yml`）：
-- Node.js `11`
-- 執行 `npm run build`
-- 將 `dist` 部署至 GitHub Pages（`master` 觸發）
+- E2E 測試：
+- `npm run test:e2e`
+- 部署：
+- 目前為 Vite 輸出 `dist/`，可接任何靜態站點部署流程（如 GitHub Pages）
 
 ## 9. UI/UX 規格（目前實作）
 - 主要語言：繁中介面
