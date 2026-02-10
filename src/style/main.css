@@ -1,11 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand: #ff686b;
-  --color-brand-soft: #ffa69e;
+  --color-work: #ff686b;
+  --color-work-soft: #ffa69e;
   --color-break: #84dcc6;
   --color-break-soft: #a5ffd6;
-  --color-neutral-soft: #f7f7f7;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f8fafc;
+  --color-border: #e2e8f0;
+  --color-text: #0f172a;
+  --color-muted: #64748b;
+
+  --radius-card: 1rem;
+  --radius-control: 0.75rem;
+}
+
+:root {
+  color: var(--color-text);
 }
 
 html,
@@ -16,7 +27,56 @@ body,
 
 body {
   margin: 0;
+  min-height: 100dvh;
   font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-  background: #fff;
-  color: #111827;
+  background:
+    radial-gradient(circle at 10% 5%, #ffe5e5 0, transparent 40%),
+    radial-gradient(circle at 95% 10%, #d9fff3 0, transparent 35%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  color: var(--color-text);
+}
+
+@layer components {
+  .app-shell {
+    @apply min-h-dvh w-full;
+  }
+
+  .app-card {
+    background: color-mix(in srgb, var(--color-surface) 88%, white 12%);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    box-shadow: 0 10px 30px rgb(15 23 42 / 0.06);
+  }
+
+  .app-input {
+    @apply h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm font-medium text-slate-800 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200;
+  }
+
+  .btn-primary {
+    @apply inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-slate-700 active:scale-[0.98] disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-slate-200 px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-300 active:scale-[0.98] disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 active:scale-[0.98] disabled:opacity-50;
+  }
+
+  .btn-danger {
+    @apply inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-rose-500 px-4 text-sm font-semibold text-white transition hover:bg-rose-600 active:scale-[0.98] disabled:opacity-50;
+  }
+
+  .icon-btn {
+    @apply inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 transition hover:bg-slate-100;
+  }
+
+  .page-title {
+    @apply text-xl font-bold tracking-tight text-slate-900 md:text-2xl;
+  }
+
+  .page-subtitle {
+    @apply text-sm text-slate-500;
+  }
 }
