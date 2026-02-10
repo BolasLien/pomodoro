@@ -13,6 +13,11 @@ const stageText = computed(() => {
   return '準備開始'
 })
 
+const canStart = computed(() => {
+  if (store.status === 'paused') return true
+  return store.todos.length > 0 || store.currentLabel.length > 0
+})
+
 function stopInterval () {
   if (intervalId.value) {
     clearInterval(intervalId.value)
@@ -20,9 +25,10 @@ function stopInterval () {
   }
 }
 
-function maybePlayAlarm (skip) {
+function maybePlayAlarm (skip, wasBreak) {
   if (skip) return
-  const audio = new Audio(`/alarms/${store.selectedAlarm}`)
+  const file = wasBreak ? store.breakEndAlarm : store.focusEndAlarm
+  const audio = new Audio(`/alarms/${file}`)
   audio.play().catch(() => {})
 }
 
@@ -56,8 +62,9 @@ function pause () {
 
 function finish (skip) {
   stopInterval()
+  const wasBreak = store.isBreak
   store.completeSegment()
-  maybePlayAlarm(skip)
+  maybePlayAlarm(skip, wasBreak)
 
   if (store.status === 'running') {
     startInterval()
@@ -87,11 +94,12 @@ onUnmounted(() => {
 
     <Timer />
 
-    <div class="grid gap-2 sm:grid-cols-3 sm:gap-3">
+    <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
       <button
         v-if="store.status !== 'running'"
         data-testid="start-btn"
-        class="btn-primary w-full"
+        class="btn-primary w-full sm:w-44"
+        :disabled="!canStart"
         @click="start"
       >
         <Play class="h-5 w-5" />
@@ -101,7 +109,7 @@ onUnmounted(() => {
       <button
         v-if="store.status === 'running'"
         data-testid="pause-btn"
-        class="btn-secondary w-full"
+        class="btn-secondary w-full sm:w-44"
         @click="pause"
       >
         <Pause class="h-5 w-5" />
@@ -111,7 +119,7 @@ onUnmounted(() => {
       <button
         v-if="store.canSkip"
         data-testid="skip-btn"
-        class="btn-ghost w-full"
+        class="btn-ghost w-full sm:w-44"
         @click="finish(true)"
       >
         <SkipForward class="h-5 w-5" />

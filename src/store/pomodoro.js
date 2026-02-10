@@ -1,7 +1,22 @@
 import { defineStore } from 'pinia'
-import { BREAK_SECONDS } from '../config/runtime'
 
 const STORAGE_KEY = 'pomodoro:pomodoro'
+const DEFAULT_SHORT_BREAK_MINUTES = 5
+const DEFAULT_LONG_BREAK_MINUTES = 15
+const DEFAULT_LONG_BREAK_INTERVAL = 4
+const DEFAULT_AUTO_START_NEXT = false
+
+function normalizeMinutes (value) {
+  const n = Number.parseInt(value, 10)
+  if (Number.isNaN(n)) return 0
+  return Math.min(Math.max(n, 0), 120)
+}
+
+function normalizeBreakInterval (value) {
+  const n = Number.parseInt(value, 10)
+  if (Number.isNaN(n)) return DEFAULT_LONG_BREAK_INTERVAL
+  return Math.min(Math.max(n, 1), 12)
+}
 
 function normalizeSeconds (value) {
   const n = Number.parseInt(value, 10)
@@ -17,8 +32,15 @@ function createInitialState () {
     currentDuration: 0,
     timeLeft: 0,
     isBreak: false,
+    breakType: 'short',
+    completedFocusCount: 0,
+    shortBreakMinutes: DEFAULT_SHORT_BREAK_MINUTES,
+    longBreakMinutes: DEFAULT_LONG_BREAK_MINUTES,
+    longBreakInterval: DEFAULT_LONG_BREAK_INTERVAL,
+    autoStartNext: DEFAULT_AUTO_START_NEXT,
     status: 'idle',
-    selectedAlarm: 'alarm1.mp3'
+    focusEndAlarm: 'alarm1.mp3',
+    breakEndAlarm: 'alarm1.mp3'
   }
 }
 
@@ -28,7 +50,19 @@ function loadPersistedState () {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return createInitialState()
-    return { ...createInitialState(), ...JSON.parse(raw) }
+    const parsed = JSON.parse(raw)
+    const legacyAlarm = typeof parsed.selectedAlarm === 'string' ? parsed.selectedAlarm : 'alarm1.mp3'
+    return {
+      ...createInitialState(),
+      ...parsed,
+      shortBreakMinutes: normalizeMinutes(parsed.shortBreakMinutes),
+      longBreakMinutes: normalizeMinutes(parsed.longBreakMinutes),
+      longBreakInterval: normalizeBreakInterval(parsed.longBreakInterval),
+      autoStartNext: Boolean(parsed.autoStartNext),
+      breakType: parsed.breakType === 'long' ? 'long' : 'short',
+      focusEndAlarm: typeof parsed.focusEndAlarm === 'string' ? parsed.focusEndAlarm : legacyAlarm,
+      breakEndAlarm: typeof parsed.breakEndAlarm === 'string' ? parsed.breakEndAlarm : legacyAlarm
+    }
   } catch {
     return createInitialState()
   }
@@ -70,6 +104,7 @@ export const usePomodoroStore = defineStore('pomodoro', {
         minutes,
         seconds
       })
+      this.todos = [...this.todos]
       return true
     },
     updateTodo (payload) {
@@ -87,6 +122,7 @@ export const usePomodoroStore = defineStore('pomodoro', {
       todo.name = name
       todo.minutes = minutes
       todo.seconds = seconds
+      this.todos = [...this.todos]
     },
     reorderTodos (list) {
       this.todos = list
@@ -103,13 +139,23 @@ export const usePomodoroStore = defineStore('pomodoro', {
         minutes: target.minutes,
         seconds: target.seconds
       })
+      this.todos = [...this.todos]
       this.finished = this.finished.filter((item) => item.id !== id)
     },
     deleteFinished (id) {
       this.finished = this.finished.filter((item) => item.id !== id)
     },
-    selectAlarm (file) {
-      this.selectedAlarm = file
+    selectFocusEndAlarm (file) {
+      this.focusEndAlarm = file
+    },
+    selectBreakEndAlarm (file) {
+      this.breakEndAlarm = file
+    },
+    updateBreakSettings (payload) {
+      this.shortBreakMinutes = normalizeMinutes(payload.shortBreakMinutes)
+      this.longBreakMinutes = normalizeMinutes(payload.longBreakMinutes)
+      this.longBreakInterval = normalizeBreakInterval(payload.longBreakInterval)
+      this.autoStartNext = Boolean(payload.autoStartNext)
     },
     startTimer () {
       if (this.status === 'paused' && this.timeLeft > 0) {
@@ -121,9 +167,11 @@ export const usePomodoroStore = defineStore('pomodoro', {
 
       if (!this.currentLabel) {
         if (this.isBreak) {
-          this.currentLabel = '休息一下'
-          this.currentDuration = BREAK_SECONDS
-          this.timeLeft = BREAK_SECONDS
+          const breakMinutes = this.breakType === 'long' ? this.longBreakMinutes : this.shortBreakMinutes
+          const breakSeconds = breakMinutes * 60
+          this.currentLabel = this.breakType === 'long' ? '長休息' : '短休息'
+          this.currentDuration = breakSeconds
+          this.timeLeft = breakSeconds
           this.activeTodo = null
         } else {
           const next = this.todos.shift()
@@ -148,6 +196,7 @@ export const usePomodoroStore = defineStore('pomodoro', {
     },
     completeSegment () {
       if (!this.isBreak && this.activeTodo) {
+        this.completedFocusCount += 1
         this.finished.push({
           id: this.activeTodo.id,
           name: this.activeTodo.name,
@@ -160,13 +209,22 @@ export const usePomodoroStore = defineStore('pomodoro', {
       this.currentDuration = 0
       this.activeTodo = null
       this.status = 'idle'
+      this.timeLeft = 0
 
-      if (this.todos.length > 0) {
-        this.isBreak = !this.isBreak
-        this.startTimer()
+      if (!this.isBreak && this.todos.length > 0) {
+        const useLongBreak = this.completedFocusCount % this.longBreakInterval === 0
+        this.isBreak = true
+        this.breakType = useLongBreak ? 'long' : 'short'
+      } else if (this.isBreak && this.todos.length > 0) {
+        this.isBreak = false
+        this.breakType = 'short'
       } else {
         this.isBreak = false
-        this.timeLeft = 0
+        this.breakType = 'short'
+      }
+
+      if ((this.isBreak || this.todos.length > 0) && this.autoStartNext) {
+        this.startTimer()
       }
     }
   }

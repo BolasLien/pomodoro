@@ -20,8 +20,15 @@ function pickPersistedState (storeId, state) {
     currentDuration: state.currentDuration,
     timeLeft: state.timeLeft,
     isBreak: state.isBreak,
+    breakType: state.breakType,
+    completedFocusCount: state.completedFocusCount,
+    shortBreakMinutes: state.shortBreakMinutes,
+    longBreakMinutes: state.longBreakMinutes,
+    longBreakInterval: state.longBreakInterval,
+    autoStartNext: state.autoStartNext,
     status: state.status,
-    selectedAlarm: state.selectedAlarm
+    focusEndAlarm: state.focusEndAlarm,
+    breakEndAlarm: state.breakEndAlarm
   }
 }
 
