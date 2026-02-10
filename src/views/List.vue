@@ -1,110 +1,140 @@
-<template>
-  <div id="list" class="row flex-column">
-    <div class="col mb-3">
-      <div class="row">
-        <div class="col-4">
-          <b-form-input v-model="newtodo" placeholder="新增待辦事項..."></b-form-input>
-        </div>
-        <div class="col-4">
-          <VueTimepicker format="mm:ss" v-model="timepick" placeholder="選擇時間"></VueTimepicker>
-        </div>
+<script setup>
+import { computed, ref } from 'vue'
+import { VueDraggableNext } from 'vue-draggable-next'
+import { GripVertical, Pencil, Trash2, Save, X, Plus } from 'lucide-vue-next'
+import { usePomodoroStore } from '../store/pomodoro'
 
-        <div class="col-2">
-          <b-btn variant="secondary" @click="addTodo">
-            <font-awesome-icon :icon="['fas','plus']"></font-awesome-icon>
-          </b-btn>
-        </div>
-        <div class="col-2">
-          <b-btn :variant="editColor" @click="listEdit">
-            <font-awesome-icon :icon="['fas','pen']"></font-awesome-icon>
-          </b-btn>
-        </div>
-      </div>
-    </div>
+const store = usePomodoroStore()
 
-    <div class="col">
-      <b-table-simple>
-        <draggable :sort="isEdit" v-model="todos" tag="tbody" v-bind="dragOption">
-          <b-tr v-if="todos.length == 0">
-            <b-td>沒有資料</b-td>
-          </b-tr>
-          <b-tr v-else v-for="(todo, index) in todos" :key="index">
-            <b-td>
-              <b-form-input v-model="todo.model" v-if="todo.edit"></b-form-input>
-              <VueTimepicker format="mm:ss" v-model="todo.timepick" placeholder="選擇時間" v-if="todo.edit"></VueTimepicker>
-              <b-btn variant="link" class="text-danger" v-if="todo.edit" @click="cancelTodo(index)">
-                <font-awesome-icon :icon="['fas','window-close']" size="2x"></font-awesome-icon>
-              </b-btn>
-              <b-btn variant="link" class="text-success" v-if="todo.edit" @click="saveTodo(index)">
-                <font-awesome-icon :icon="['fas','save']" size="2x"></font-awesome-icon>
-              </b-btn>
-              <span v-else>{{ '待辦事項： ' + todo.name + ' 需要時間： ' + `${todo.timepick.mm} 分 ${todo.timepick.ss} 秒`}}</span>
-            </b-td>
-            <b-td>
-              <b-btn v-if="isEdit" variant="link" class="text-primary" @click="editTodo(index)">
-                <font-awesome-icon :icon="['fas','pen']"></font-awesome-icon>
-              </b-btn>
-              <b-btn v-if="isEdit" variant="link" class="text-danger" @click="delTodo(index)">
-                <font-awesome-icon :icon="['fas','trash-alt']"></font-awesome-icon>
-              </b-btn>
-            </b-td>
-          </b-tr>
-        </draggable>
-      </b-table-simple>
-    </div>
-  </div>
-</template>
+const newName = ref('')
+const newMinutes = ref(25)
+const newSeconds = ref(0)
 
-<script>
-export default {
-  data () {
-    return {
-      newtodo: '',
-      timepick: {},
-      isEdit: false,
-      editColor: 'secondary',
-      dragOption: {
-        animation: 200
-      }
-    }
-  },
-  methods: {
-    addTodo () {
-      if (this.newtodo.length === 0) {
-        alert('請輸入待辦事項')
-      } else if (Object.keys(this.timepick).length === 0 || this.timepick.mm.length === 0 || this.timepick.ss.length === 0 || (parseInt(this.timepick.mm) === 0 && parseInt(this.timepick.ss) === 0)) {
-        alert('請選擇時間')
-      } else {
-        // const timelength = parseInt(this.timepick.mm * 60) + parseInt(this.timepick.ss)
-        this.$store.commit('addTodo', [this.newtodo, this.timepick])
-      }
-    },
-    delTodo (index) {
-      this.$store.commit('delTodo', index)
-    },
-    editTodo (index) {
-      this.$store.commit('editTodo', index)
-    },
-    cancelTodo (index) {
-      this.$store.commit('cancelTodo', index)
-    },
-    saveTodo (index) {
-      this.$store.commit('saveTodo', index)
-    },
-    listEdit () {
-      this.isEdit = !this.isEdit
-      this.editColor = this.isEdit ? 'danger' : 'secondary'
-    }
-  },
-  computed: {
-    todos: {
-      get () {
-        return this.$store.getters.todos
-      },
-      set (value) {
-        this.$store.commit('dragTodo', value)
-      }
-    }
+const editingId = ref('')
+const editName = ref('')
+const editMinutes = ref(0)
+const editSeconds = ref(0)
+
+const editMode = ref(false)
+
+const todosModel = computed({
+  get: () => store.todos,
+  set: (value) => store.reorderTodos(value)
+})
+
+function addTodo() {
+  const ok = store.addTodo({
+    name: newName.value,
+    minutes: newMinutes.value,
+    seconds: newSeconds.value
+  })
+
+  if (!ok) {
+    window.alert('請輸入待辦事項與有效時間')
+    return
   }
+
+  newName.value = ''
+  newMinutes.value = 25
+  newSeconds.value = 0
+}
+
+function startEdit(todo) {
+  editingId.value = todo.id
+  editName.value = todo.name
+  editMinutes.value = todo.minutes
+  editSeconds.value = todo.seconds
+}
+
+function cancelEdit() {
+  editingId.value = ''
+}
+
+function saveEdit(todoId) {
+  store.updateTodo({
+    id: todoId,
+    name: editName.value,
+    minutes: editMinutes.value,
+    seconds: editSeconds.value
+  })
+  editingId.value = ''
 }
 </script>
+
+<template>
+  <section class="space-y-4" data-testid="list-page">
+    <div class="grid gap-2 rounded-xl border border-slate-200 bg-white p-4 md:grid-cols-[1fr_120px_120px_auto_auto]">
+      <input
+        v-model="newName"
+        data-testid="todo-input"
+        class="rounded-lg border border-slate-300 px-3 py-2"
+        placeholder="新增待辦事項..."
+      />
+
+      <input
+        v-model.number="newMinutes"
+        class="rounded-lg border border-slate-300 px-3 py-2"
+        type="number"
+        min="0"
+        max="59"
+      />
+
+      <input
+        v-model.number="newSeconds"
+        class="rounded-lg border border-slate-300 px-3 py-2"
+        type="number"
+        min="0"
+        max="59"
+      />
+
+      <button class="rounded-lg bg-black px-3 py-2 text-white" @click="addTodo">
+        <Plus class="h-4 w-4" />
+      </button>
+
+      <button
+        class="rounded-lg px-3 py-2 text-white"
+        :class="editMode ? 'bg-rose-500' : 'bg-slate-600'"
+        @click="editMode = !editMode"
+      >
+        <Pencil class="h-4 w-4" />
+      </button>
+    </div>
+
+    <div class="rounded-xl border border-slate-200 bg-white">
+      <VueDraggableNext v-model="todosModel" item-key="id" handle=".drag-handle" :disabled="!editMode">
+        <div
+          v-for="todo in todosModel"
+          :key="todo.id"
+          class="grid items-center gap-2 border-b border-slate-100 p-3 last:border-b-0 md:grid-cols-[auto_1fr_auto]"
+        >
+          <button v-if="editMode" class="drag-handle text-slate-500">
+            <GripVertical class="h-4 w-4" />
+          </button>
+          <div v-else class="h-4 w-4"></div>
+
+          <template v-if="editingId === todo.id">
+            <div class="grid gap-2 md:grid-cols-[1fr_100px_100px]">
+              <input v-model="editName" class="rounded-lg border border-slate-300 px-3 py-2" />
+              <input v-model.number="editMinutes" type="number" min="0" max="59" class="rounded-lg border border-slate-300 px-3 py-2" />
+              <input v-model.number="editSeconds" type="number" min="0" max="59" class="rounded-lg border border-slate-300 px-3 py-2" />
+            </div>
+            <div class="flex gap-2">
+              <button class="rounded-lg bg-emerald-500 p-2 text-white" @click="saveEdit(todo.id)"><Save class="h-4 w-4" /></button>
+              <button class="rounded-lg bg-slate-300 p-2" @click="cancelEdit"><X class="h-4 w-4" /></button>
+            </div>
+          </template>
+
+          <template v-else>
+            <p class="font-medium">待辦事項：{{ todo.name }}，{{ String(todo.minutes).padStart(2, '0') }}:{{ String(todo.seconds).padStart(2, '0') }}</p>
+            <div v-if="editMode" class="flex gap-2">
+              <button class="rounded-lg bg-sky-500 p-2 text-white" @click="startEdit(todo)"><Pencil class="h-4 w-4" /></button>
+              <button class="rounded-lg bg-rose-500 p-2 text-white" @click="store.deleteTodo(todo.id)"><Trash2 class="h-4 w-4" /></button>
+            </div>
+          </template>
+        </div>
+      </VueDraggableNext>
+
+      <p v-if="todosModel.length === 0" class="p-4 text-center text-slate-500">沒有資料</p>
+    </div>
+  </section>
+</template>

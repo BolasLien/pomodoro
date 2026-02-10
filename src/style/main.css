@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #ff686b;
+  --color-brand-soft: #ffa69e;
+  --color-break: #84dcc6;
+  --color-break-soft: #a5ffd6;
+  --color-neutral-soft: #f7f7f7;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  background: #fff;
+  color: #111827;
+}

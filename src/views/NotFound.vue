@@ -1,3 +1,5 @@
 <template>
-  <h1>404 Page Not Found</h1>
+  <section class="rounded-xl border border-slate-200 bg-white p-8 text-center">
+    <h1 class="text-2xl font-bold">404 Page Not Found</h1>
+  </section>
 </template>

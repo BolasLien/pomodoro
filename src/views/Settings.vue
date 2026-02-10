@@ -1,74 +1,38 @@
-<template>
-  <div id="settings" class="row">
-    <div class="col">
-      <b-table class="text-center" :items="items" :fields="fields" @row-clicked="selectAlarm">
-        <template v-slot:cell(preview)="data">
-          <!-- <audio controls :src="'./alarms/'+data.item.file"></audio> -->
-          <b-btn @click="playAudio(data)">
-            <font-awesome-icon :icon="['fas','play']"></font-awesome-icon>
-          </b-btn>
-        </template>
-        <template v-slot:cell(select)="data">
-          <font-awesome-icon v-if="data.item.file == alarm" :icon="['fas','check']" size="lg"></font-awesome-icon>
-        </template>
-      </b-table>
-    </div>
-  </div>
-</template>
+<script setup>
+import { Play, Check } from 'lucide-vue-next'
+import { usePomodoroStore } from '../store/pomodoro'
 
-<script>
-export default {
-  data () {
-    return {
-      items: [
-        {
-          name: '鬧鈴',
-          file: 'Alarm1.mp3'
-        },
-        {
-          name: '電子鬧鈴',
-          file: 'Alarm2.mp3'
-        },
-        {
-          name: '哨聲長',
-          file: 'Whistle1.mp3'
-        },
-        {
-          name: '哨聲短',
-          file: 'Whistle2.mp3'
-        }
-      ],
-      fields: [
-        {
-          key: 'name',
-          label: '名稱'
-        },
-        {
-          key: 'preview',
-          label: '預覽'
-        },
-        {
-          key: 'select',
-          label: '選擇'
-        }
-      ]
-    }
-  },
-  computed: {
-    alarm () {
-      return this.$store.getters.alarm
-    }
-  },
-  methods: {
-    selectAlarm (item) {
-      this.$store.commit('selectAlarm', item.file)
-    },
-    playAudio (data) {
-      const audio = new Audio()
-      audio.src = './alarms/' + data.item.file
-      audio.play()
-      console.log(data.item.file)
-    }
-  }
+const store = usePomodoroStore()
+
+const alarms = [
+  { name: '鬧鈴', file: 'alarm1.mp3' },
+  { name: '電子鬧鈴', file: 'Alarm2.mp3' },
+  { name: '哨聲長', file: 'Whistle1.mp3' },
+  { name: '哨聲短', file: 'Whistle2.mp3' }
+]
+
+function preview(file) {
+  const audio = new Audio(`/alarms/${file}`)
+  audio.play().catch(() => {})
 }
 </script>
+
+<template>
+  <section class="rounded-xl border border-slate-200 bg-white" data-testid="settings-page">
+    <div
+      v-for="item in alarms"
+      :key="item.file"
+      class="grid grid-cols-[1fr_auto_auto] items-center gap-2 border-b border-slate-100 p-3 last:border-b-0"
+      @click="store.selectAlarm(item.file)"
+    >
+      <span class="font-medium">{{ item.name }}</span>
+
+      <button class="rounded-lg bg-slate-200 p-2" @click.stop="preview(item.file)">
+        <Play class="h-4 w-4" />
+      </button>
+
+      <Check v-if="store.selectedAlarm === item.file" class="h-5 w-5 text-emerald-600" />
+      <div v-else class="h-5 w-5"></div>
+    </div>
+  </section>
+</template>

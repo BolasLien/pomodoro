@@ -1,106 +1,105 @@
+<script setup>
+import { onMounted, onUnmounted, ref } from 'vue'
+import { Play, Pause, SkipForward } from 'lucide-vue-next'
+import Timer from '../components/Timer.vue'
+import { usePomodoroStore } from '../store/pomodoro'
+
+const store = usePomodoroStore()
+const intervalId = ref(null)
+
+function stopInterval() {
+  if (intervalId.value) {
+    clearInterval(intervalId.value)
+    intervalId.value = null
+  }
+}
+
+function maybePlayAlarm(skip) {
+  if (skip) return
+  const audio = new Audio(`/alarms/${store.selectedAlarm}`)
+  audio.play().catch(() => {})
+}
+
+function startInterval() {
+  stopInterval()
+  intervalId.value = setInterval(() => {
+    if (store.status !== 'running') {
+      stopInterval()
+      return
+    }
+
+    store.tick()
+
+    if (store.timeLeft <= 0) {
+      finish(false)
+    }
+  }, 1000)
+}
+
+function start() {
+  store.startTimer()
+  if (store.status === 'running') {
+    startInterval()
+  }
+}
+
+function pause() {
+  store.pauseTimer()
+  stopInterval()
+}
+
+function finish(skip) {
+  stopInterval()
+  store.completeSegment()
+  maybePlayAlarm(skip)
+
+  if (store.status === 'running') {
+    startInterval()
+  }
+}
+
+onMounted(() => {
+  if (store.status === 'running') {
+    startInterval()
+  }
+})
+
+onUnmounted(() => {
+  stopInterval()
+})
+</script>
+
 <template>
-  <div id="home" class="row flex-column justify-content-center">
-    <div class="col text-center mt-5 mb-5">
-        <timer></timer>
-    </div>
-    <div class="col text-center">
-      <b-btn variant="light" v-if="status != 1" @click="start">
-        <font-awesome-icon :icon="['fas','play']" size="2x"></font-awesome-icon>
-      </b-btn>
+  <div class="space-y-6">
+    <Timer />
 
-      <b-btn variant="secondary" v-if="status == 1" @click="pause">
-        <font-awesome-icon :icon="['fas','pause']" size="2x"></font-awesome-icon>
-      </b-btn>
+    <div class="flex justify-center gap-4">
+      <button
+        v-if="store.status !== 'running'"
+        data-testid="start-btn"
+        class="rounded-xl bg-black px-6 py-3 text-white transition hover:opacity-90"
+        @click="start"
+      >
+        <Play class="h-5 w-5" />
+      </button>
 
-      <b-btn variant="light" v-if="current.length > 0 || todos.length > 0" @click="finish(true,current)">
-        <font-awesome-icon :icon="['fas','step-forward']" size="2x"></font-awesome-icon>
-      </b-btn>
+      <button
+        v-if="store.status === 'running'"
+        data-testid="pause-btn"
+        class="rounded-xl bg-slate-700 px-6 py-3 text-white transition hover:opacity-90"
+        @click="pause"
+      >
+        <Pause class="h-5 w-5" />
+      </button>
+
+      <button
+        v-if="store.canSkip"
+        data-testid="skip-btn"
+        class="rounded-xl bg-slate-200 px-6 py-3 text-slate-900 transition hover:bg-slate-300"
+        @click="finish(true)"
+      >
+        <SkipForward class="h-5 w-5" />
+      </button>
     </div>
   </div>
 </template>
-
-<script>
-import Timer from '../components/Timer.vue'
-export default {
-  data () {
-    return {
-      timer: 0
-    }
-  },
-  components: {
-    timer: Timer
-  },
-  computed: {
-    alarm () {
-      return this.$store.getters.alarm
-    },
-    timepick () {
-      return this.$store.getters.timepick
-    },
-    timeleft () {
-      return this.$store.getters.timeleft
-    },
-    current () {
-      return this.$store.getters.current
-    },
-    todos () {
-      return this.$store.getters.todos
-    },
-    status: {
-      get () {
-        return this.$store.getters.status
-      },
-      set (value) {
-        this.$store.commit('setStatus', value)
-      }
-    }
-  },
-  methods: {
-    start () {
-      if (this.status === 2) {
-      // 暫停後繼續
-        this.status = 1
-        this.timer = setInterval(() => {
-          this.$store.commit('countdown')
-          if (this.timeleft <= 0) {
-            this.finish(false)
-          }
-        }, 1000)
-      } else {
-      // 開始新的倒數
-        if (this.todos.length > 0) {
-          this.$store.commit('start')
-          this.status = 1
-          this.timer = setInterval(() => {
-            this.$store.commit('countdown')
-            if (this.timeleft <= 0) {
-              this.finish(false)
-            }
-          }, 1000)
-        }
-      }
-    },
-    finish (skip) {
-      clearInterval(this.timer)
-      this.status = 0
-      this.$store.commit('finish', [this.current, this.timepick])
-
-      if (!skip) {
-        const audio = new Audio()
-        audio.src = './alarms/' + this.alarm
-        audio.play()
-      }
-
-      if (this.todos.length > 0) {
-        this.start()
-      } else {
-        // alert('太棒了！你完成所有的任務了！')
-      }
-    },
-    pause () {
-      clearInterval(this.timer)
-      this.status = 2
-    }
-  }
-}
-</script>
