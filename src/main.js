@@ -1,40 +1,60 @@
-import '@babel/polyfill'
-import 'mutationobserver-shim'
-import Vue from 'vue'
-import './plugins/bootstrap-vue'
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
-import './registerServiceWorker'
 import router from './router'
-import store from './store'
-import VueGtag from 'vue-gtag'
+import './style/main.css'
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faCheck, faPen, faTrashAlt, faSave, faWindowClose, faPlay, faPause, faStepForward, faPlusCircle, faCog, faClock, faPlus, faTasks } from '@fortawesome/free-solid-svg-icons'
+const pinia = createPinia()
+const persistTimers = new Map()
 
-import draggable from 'vuedraggable'
-import VueEllipseProgress from 'vue-ellipse-progress'
-import VueTimepicker from 'vue2-timepicker'
+function pickPersistedState (storeId, state) {
+  if (storeId !== 'pomodoro') {
+    return state
+  }
 
-import 'noto-sans-tc/noto_sans_tc_regular/css.css'
-import './style/style.styl'
-import 'vue2-timepicker/dist/VueTimepicker.css'
+  return {
+    todos: state.todos,
+    finished: state.finished,
+    currentLabel: state.currentLabel,
+    activeTodo: state.activeTodo,
+    currentDuration: state.currentDuration,
+    timeLeft: state.timeLeft,
+    isBreak: state.isBreak,
+    breakType: state.breakType,
+    completedFocusCount: state.completedFocusCount,
+    shortBreakMinutes: state.shortBreakMinutes,
+    longBreakMinutes: state.longBreakMinutes,
+    longBreakInterval: state.longBreakInterval,
+    autoStartNext: state.autoStartNext,
+    status: state.status,
+    focusEndAlarm: state.focusEndAlarm,
+    breakEndAlarm: state.breakEndAlarm
+  }
+}
 
-library.add(faCheck, faPen, faTrashAlt, faSave, faWindowClose, faPlay, faPause, faStepForward, faPlusCircle, faCog, faClock, faPlus, faTasks)
-Vue.component('font-awesome-icon', FontAwesomeIcon)
+function safePersistState (storeId, state) {
+  try {
+    const payload = pickPersistedState(storeId, state)
+    localStorage.setItem(`pomodoro:${storeId}`, JSON.stringify(payload))
+  } catch (error) {
+    console.warn(`[persist] failed for store ${storeId}:`, error)
+  }
+}
 
-Vue.component('draggable', draggable)
-Vue.use(VueEllipseProgress, 'vep')
-Vue.component('VueTimepicker', VueTimepicker)
+pinia.use(({ store }) => {
+  store.$subscribe((_, state) => {
+    const prevTimer = persistTimers.get(store.$id)
+    if (prevTimer) {
+      clearTimeout(prevTimer)
+    }
 
-Vue.use(VueGtag, {
-  config: { id: 'UA-168227875-1' }
+    const timer = setTimeout(() => {
+      safePersistState(store.$id, state)
+      persistTimers.delete(store.$id)
+    }, 250)
+
+    persistTimers.set(store.$id, timer)
+  })
 })
 
-Vue.config.productionTip = false
-
-new Vue({
-  router,
-  store,
-  render: h => h(App)
-}).$mount('#app')
+createApp(App).use(pinia).use(router).mount('#app')
